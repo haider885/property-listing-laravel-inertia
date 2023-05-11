@@ -14,12 +14,51 @@ class ListingController extends Controller
         $this->authorizeResource(Listing::class, 'listing');
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $filters = $request->only([
+            'priceFrom', 'priceTo', 'beds', 'baths', 'areaFrom', 'areaTo'
+        ]);
+
+        // $query = Listing::orderByDesc('created_at');
+
+        // $query->when(
+        //     $filters['priceFrom'] ?? false,
+        //     fn ($query, $value) => $query->where('price', '>=', $value)
+        // );
+
+        // if ($filters['priceFrom'] ?? false) {
+        //     $query->where('price', '>=', $filters['priceFrom']);
+        // }
+
+        // if ($filters['priceTo'] ?? false) {
+        //     $query->where('price', '<=', $filters['priceTo']);
+        // }
+
+        // if ($filters['beds'] ?? false) {
+        //     $query->where('beds', $filters['beds']);
+        // }
+
+        // if ($filters['baths'] ?? false) {
+        //     $query->where('baths', $filters['baths']);
+        // }
+
+        // if ($filters['areaFrom'] ?? false) {
+        //     $query->where('area', '>=', $filters['areaFrom']);
+        // }
+
+        // if ($filters['areaTo'] ?? false) {
+        //     $query->where('area', '<=', $filters['areaTo']);
+        // }
+
         return inertia(
             'Listing/Index',
             [
-                'listings'=> Listing::all()
+                'filters' => $filters,
+                'listings'=> Listing::mostRecent()
+                    ->filter($filters)
+                    ->paginate(10)
+                    ->withQueryString()
             ]
         );
     }
